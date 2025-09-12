@@ -3,11 +3,15 @@ Check your distros package manager to see what to install. You can build/compile
 if you like. 
 
 GRUB's documentation is here:
-<https://www.gnu.org/software/grub/?
+<https://www.gnu.org/software/grub/>
 <https://www.gnu.org/software/grub/manual/grub/grub.html>
+
+GRUB's multiboot2.h specification
+<https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html>
 
 Some general notes:
 <https://wiki.osdev.org/GRUB>
+<https://wiki.osdev.org/Multiboot>
 <https://forum.osdev.org/viewtopic.php?t=38557>
 
 So, GRUB2 searches the ISO filesystem starting from the root. GRUB2 also needs a valid
@@ -32,7 +36,7 @@ whether it has a valid Multiboot2 header that the GRUB2 bootloader would recogni
 `grub-file --is-x86-multiboot2 <filename>`
 
 `grub-install --target=i386-pc /dev/null`
-`grub-install --target=i386-pc --boot-directory=/mnt/boot /dev/null
+`grub-install --target=i386-pc --boot-directory=/mnt/boot /dev/null`
 
 In order for the boot to work:
 - make sure the kernel bin is in the /boot as boot/kernel.bin 
