@@ -1,6 +1,6 @@
 # ClassicOS-64bit
 
-ClassicOS-64bit is a custom 64-bit operating system targeting legacy x86-64 CPUs (e.g., Pentium 4, Core 2 Duo, early Core i3/i5/i7, and various Xeon processors). Built with GRUB2 and Multiboot2, it’s designed for older hardware, supporting Pentium 3 and later 64-bit Intel CPUs. This project is written in C and focuses on a minimal, efficient kernel for legacy systems.
+ClassicOS-64bit is a custom 64-bit operating system targeting legacy x86-64 CPUs (e.g., Pentium 4, Core 2 Duo, early Core i3/i5/i7, and various Xeon processors). Built with GRUB2 and Multiboot2, itâ€™s designed for older hardware, supporting Pentium 3 and later legacy 64-bit Intel CPUs See: [Targets](docs/target_cpus.md). This project is written in C and focuses on a minimal, efficient kernel for legacy systems.
 
 ## Getting Started
 
@@ -15,10 +15,10 @@ ClassicOS-64bit is a custom 64-bit operating system targeting legacy x86-64 CPUs
 
 - src/: C source files (e.g., kmain.c).
 - include/: Header files (e.g., multiboot2.h).
-- oot/: Bootloader files, including linker.ld and GRUB config.
+- boot/: Bootloader files, including linker.ld and GRUB config.
 - iso/: ISO generation files (e.g., iso/boot/grub/).
-- uild/: Compiled binaries and artifacts.
-- docs/: Detailed documentation.
+- build/: Compiled binaries and artifacts.
+- docs/: Detailed documentation and build instructions
 
 ## Contributing
 
