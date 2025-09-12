@@ -3,13 +3,16 @@ Check your distros package manager to see what to install. You can build/compile
 if you like. 
 
 GRUB's documentation is here:
+
 <https://www.gnu.org/software/grub/>
 <https://www.gnu.org/software/grub/manual/grub/grub.html>
 
-GRUB's multiboot2.h specification
+GRUB's multiboot2.h specification:
+
 <https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html>
 
 Some general notes:
+
 <https://wiki.osdev.org/GRUB>
 <https://wiki.osdev.org/Multiboot>
 <https://forum.osdev.org/viewtopic.php?t=38557>
@@ -23,11 +26,13 @@ Note: both do the same thing
 
 The structure should look like 
 
+```shell
 iso/
 ├── boot/
 │   ├── grub/
 │   │   └── grub.cfg      ← GRUB config
 │   └── kernel.bin        ← ClassicOS-64bit Multiboot(2) kernel
+```
 
 After running this command you should get a classicost-64bit.iso
 
