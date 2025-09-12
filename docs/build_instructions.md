@@ -26,27 +26,27 @@ defined in GCC's documentation.
 
 -o this is the output file (which will be `kernel.o`)
 
--ffrestanding
--fno-pic
--fno-pie
--fno-stack-protector
--mno-red-zone
--nostdlib
--m64
--fno-builtin
--fno-exceptions
--fno-rtti
--nodefaultlibs
--nostartfiles
+`-ffrestanding`
+`-fno-pic`
+`-fno-pie`
+`-fno-stack-protector`
+`-mno-red-zone`
+`-nostdlib`
+`-m64`
+`-fno-builtin`
+`-fno-exceptions`
+`-fno-rtti`
+`-nodefaultlibs`
+`-nostartfiles`
 
-To give us error and warning generation
--Wall
--Werror
--Wextra
--Wpedantic
--pedantic
--pedantic-errors
--everything
+To give us error and warning generation, use:
+`-Wall`
+`-Werror`
+`-Wextra`
+`-Wpedantic`
+`-pedantic`
+`-pedantic-errors`
+`-everything`
 
 -std=c99 or -stc=C11
 
