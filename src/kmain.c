@@ -211,6 +211,11 @@ void parse_memory_map(void *mbd) {
 void long_mode_entry(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb_height, uint8_t fb_type) __attribute__((noreturn));
 
 void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb_height, uint8_t fb_type) {
+	(void)mbd;
+	(void)fb_addr;
+	(void)fb_width;
+	(void)fb_height;
+	(void)fb_type;
     /* Page tables (aligned) */
     static uint64_t pml4[512] __attribute__((aligned(4096))) = {0};
     static uint64_t pdpt[512] __attribute__((aligned(4096))) = {0};
