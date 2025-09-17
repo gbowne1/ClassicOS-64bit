@@ -246,7 +246,7 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
     asm volatile(
 	    "mov $0xC0000080, %%ecx\n\t"  /* EFER MSR */
 	    "rdmsr\n\t"
-	    "or $0x100, %%eax\n\t"        /* Set Long Mode Enable bit */
+	    "orl $0x100, %%eax\n\t"        /* Set Long Mode Enable bit */
 	    "wrmsr\n\t"
 	    : "=a"(eax), "=d"(edx)        /* output: updated eax, edx */
 	    :                             /* input: none */
