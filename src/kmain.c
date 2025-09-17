@@ -229,7 +229,7 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
     pml4[0] = (uint64_t)pdpt | 0x3;    /* Present + Writable */
 
     /* Load CR3 with PML4 physical address */
-    asm volatile("mov %0, %%cr3" : : "r"(pml4));
+    asm volatile("movq %0, %%cr3" : : "r"((uint64_t)pml4) : "memory");
 
     /* Enable PAE (bit 5 in CR4) */
     asm volatile(
@@ -238,19 +238,19 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
         "movl %%eax, %%cr4\n\t"
         :
         :
-        : "eax"
+        : "eax", "memory"
     );
 
     /* Enable Long Mode in EFER MSR (MSR 0xC0000080, bit 8) */
     uint32_t eax, edx;
     asm volatile(
-        "movl $0xC0000080, %%ecx\n\t"  /* EFER MSR */
+        "movl $0xC0000080, %%ecx\n\t"
         "rdmsr\n\t"
-        "orl $0x100, %%eax\n\t"        /* Set Long Mode Enable bit */
+        "orl $0x100, %%eax\n\t"
         "wrmsr\n\t"
-        : "=a"(eax), "=d"(edx)         /* output: updated eax, edx */
-        :                              /* input: none */
-        : "ecx"
+        : "=a"(eax), "=d"(edx)
+        :
+        : "ecx", "memory"
     );
 
     /* Enable Paging (bit 31 in CR0) */
@@ -260,7 +260,7 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
         "movl %%eax, %%cr0\n\t"
         :
         :
-        : "eax"
+        : "eax", "memory"
     );
 
     /* Setup a minimal GDT (3 entries: null, code, data) */
@@ -278,25 +278,25 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
         .base = (uint64_t)&gdt,
     };
 
-    asm volatile("lgdt %0" : : "m"(gdtr));
+    asm volatile("lgdt %0" : : "m"(gdtr) : "memory");
 
     /* Far jump to flush pipeline and switch to 64-bit code segment */
     asm volatile(
         "cli\n\t"
-        "mov $0x08, %%ax\n\t"     /* Code segment selector */
+        "mov $0x08, %%ax\n\t"
         "mov %%ax, %%ds\n\t"
         "mov %%ax, %%es\n\t"
         "mov %%ax, %%ss\n\t"
         "mov %%ax, %%fs\n\t"
         "mov %%ax, %%gs\n\t"
-        "pushq $0x08\n\t"          /* Code segment selector (64-bit) */
+        "pushq $0x08\n\t"
         "lea 1f(%%rip), %%rax\n\t"
         "pushq %%rax\n\t"
         "lretq\n"
         "1:\n\t"
         :
         :
-        : "rax", "ax"
+        : "rax", "ax", "memory"
     );
 
     /* Call long_mode_entry (should be in 64-bit mode now) */
