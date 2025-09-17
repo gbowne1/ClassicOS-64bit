@@ -211,11 +211,11 @@ void parse_memory_map(void *mbd) {
 void long_mode_entry(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb_height, uint8_t fb_type) __attribute__((noreturn));
 
 void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb_height, uint8_t fb_type) {
-	(void)mbd;
-	(void)fb_addr;
-	(void)fb_width;
-	(void)fb_height;
-	(void)fb_type;
+    (void)mbd;
+    (void)fb_addr;
+    (void)fb_width;
+    (void)fb_height;
+    (void)fb_type;
     /* Page tables (aligned) */
     static uint64_t pml4[512] __attribute__((aligned(4096))) = {0};
     static uint64_t pdpt[512] __attribute__((aligned(4096))) = {0};
@@ -233,34 +233,34 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
 
     /* Enable PAE (bit 5 in CR4) */
     asm volatile(
-        "mov %%cr4, %%rax\n"
-        "or $0x20, %%rax\n"
-        "mov %%rax, %%cr4\n"
+        "movl %%cr4, %%eax\n\t"
+        "orl $0x20, %%eax\n\t"
+        "movl %%eax, %%cr4\n\t"
         :
         :
-        : "rax"
+        : "eax"
     );
 
     /* Enable Long Mode in EFER MSR (MSR 0xC0000080, bit 8) */
     uint32_t eax, edx;
     asm volatile(
-	    "movl $0xC0000080, %%ecx\n\t"  /* EFER MSR */
-	    "rdmsr\n\t"
-	    "orl $0x100, %%eax\n\t"        /* Set Long Mode Enable bit */
-	    "wrmsr\n\t"
-	    : "=a"(eax), "=d"(edx)        /* output: updated eax, edx */
-	    :                             /* input: none */
-	    : "ecx"
-	);
+        "movl $0xC0000080, %%ecx\n\t"  /* EFER MSR */
+        "rdmsr\n\t"
+        "orl $0x100, %%eax\n\t"        /* Set Long Mode Enable bit */
+        "wrmsr\n\t"
+        : "=a"(eax), "=d"(edx)         /* output: updated eax, edx */
+        :                              /* input: none */
+        : "ecx"
+    );
 
     /* Enable Paging (bit 31 in CR0) */
     asm volatile(
-        "mov %%cr0, %%rax\n"
-        "or $0x80000000, %%rax\n"
-        "mov %%rax, %%cr0\n"
+        "movl %%cr0, %%eax\n\t"
+        "orl $0x80000000, %%eax\n\t"
+        "movl %%eax, %%cr0\n\t"
         :
         :
-        : "rax"
+        : "eax"
     );
 
     /* Setup a minimal GDT (3 entries: null, code, data) */
@@ -282,7 +282,7 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
 
     /* Far jump to flush pipeline and switch to 64-bit code segment */
     asm volatile(
-	    "cli\n\t"
+        "cli\n\t"
         "mov $0x08, %%ax\n\t"     /* Code segment selector */
         "mov %%ax, %%ds\n\t"
         "mov %%ax, %%es\n\t"
@@ -299,17 +299,8 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
         : "rax", "ax"
     );
 
-    /* We should be Now in 64-bit mode - this needs work */
-
-    /*__attribute__((noreturn))
-     * void long_mode_entry(void) {
-     *   // Now in 64-bit mode
-     *
-     *  // Clear BSS, initialize devices, framebuffer, print messages, etc.
-     *
-     *  for (;;)
-     *       asm volatile("hlt");
-    }*/
+    /* Call long_mode_entry (should be in 64-bit mode now) */
+    long_mode_entry(mbd, fb_addr, fb_width, fb_height, fb_type);
 }
 
 void long_mode_entry(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb_height, uint8_t fb_type) {
