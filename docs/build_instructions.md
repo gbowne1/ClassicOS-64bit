@@ -40,6 +40,7 @@ defined in GCC's documentation.
 `-nostartfiles`
 
 To give us error and warning generation, use:
+
 `-Wall`
 `-Werror`
 `-Wextra`
@@ -48,12 +49,16 @@ To give us error and warning generation, use:
 `-pedantic-errors`
 `-everything`
 
--std=c99 or -stc=C11
+The correct compile command is 
+
+` gcc -ffreestanding -fno-pic -fno-pie -fno-stack-protector -mno-red-zone -nostdlib -m64 -fno-builtin -fno-exceptions -nodefaultlibs -nostartfiles -Wall -Werror -Wextra -Wpedantic -pedantic -pedantic-errors -std=gnu11 -O0 -Iinclude -o kernel.o -c src/kmain.c`
+
+as -std=c11 doesn't work with this code as it's in GNU GAS/AS assembly syntax and we didn't use any specific flags or use `__asm__`
 
 -O0, -01 or -O2 for debugging
 
 -I to give it the path for the include files
 
-We could also possible use -mtune and -march, but probably not necessary.
+We could also possibly use -mtune and -march, but probably not necessary. also =march=x86-64 is a thing.
 
 You can read about these here <https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html>
