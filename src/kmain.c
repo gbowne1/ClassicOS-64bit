@@ -276,14 +276,13 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
 
     /* Far jump to flush pipeline and switch to 64-bit code segment */
     asm volatile(
-	   "cli\n\t"
+	    "cli\n\t"
         "mov $0x08, %%ax\n\t"     /* Code segment selector */
         "mov %%ax, %%ds\n\t"
         "mov %%ax, %%es\n\t"
         "mov %%ax, %%ss\n\t"
         "mov %%ax, %%fs\n\t"
         "mov %%ax, %%gs\n\t"
-
         "pushq $0x08\n\t"          /* Code segment selector (64-bit) */
         "lea 1f(%%rip), %%rax\n\t"
         "pushq %%rax\n\t"
