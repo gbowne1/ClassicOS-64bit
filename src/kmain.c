@@ -244,12 +244,12 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
     /* Enable Long Mode in EFER MSR (MSR 0xC0000080, bit 8) */
     uint32_t eax, edx;
     asm volatile(
-	    "mov $0xC0000080, %%ecx\n\t"  // EFER MSR
+	    "mov $0xC0000080, %%ecx\n\t"  /* EFER MSR */
 	    "rdmsr\n\t"
-	    "or $0x100, %%eax\n\t"        // Set Long Mode Enable bit
+	    "or $0x100, %%eax\n\t"        /* Set Long Mode Enable bit */
 	    "wrmsr\n\t"
-	    : "=a"(eax), "=d"(edx)        // output: updated eax, edx
-	    :                             // input: none
+	    : "=a"(eax), "=d"(edx)        /* output: updated eax, edx */
+	    :                             /* input: none */
 	    : "ecx"
 	);
 
@@ -338,6 +338,28 @@ void long_mode_entry(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
     for (size_t i = 0; message[i] != '\0'; i++) {
         video_memory[i * 2] = message[i];
         video_memory[i * 2 + 1] = 0x07;
+    }
+
+    /* Display framebuffer type as a decimal number */
+    char fb_type_str[4];
+    fb_type_str[3] = '\0';
+    fb_type_str[2] = '0' + (fb_type % 10);
+    fb_type_str[1] = '0' + ((fb_type / 10) % 10);
+    fb_type_str[0] = '0' + ((fb_type / 100) % 10);
+
+    const char *type_msg = "Framebuffer Type: ";
+    size_t offset = 32; // Place below the message, adjust as needed
+    for (size_t i = 0; type_msg[i] != '\0'; i++) {
+        video_memory[offset * 2] = type_msg[i];
+        video_memory[offset * 2 + 1] = 0x07;
+        offset++;
+    }
+    for (size_t i = 0; i < 3; i++) {
+        if (fb_type_str[i] != '0' || i == 2) { // Don't print leading zeros except for '0'
+            video_memory[offset * 2] = fb_type_str[i];
+            video_memory[offset * 2 + 1] = 0x07;
+            offset++;
+        }
     }
 
     for (;;)
