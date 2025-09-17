@@ -244,7 +244,7 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
     /* Enable Long Mode in EFER MSR (MSR 0xC0000080, bit 8) */
     uint32_t eax, edx;
     asm volatile(
-	    "mov $0xC0000080, %%ecx\n\t"  /* EFER MSR */
+	    "movl $0xC0000080, %%ecx\n\t"  /* EFER MSR */
 	    "rdmsr\n\t"
 	    "orl $0x100, %%eax\n\t"        /* Set Long Mode Enable bit */
 	    "wrmsr\n\t"
