@@ -280,15 +280,22 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
 
     asm volatile("lgdt %0" : : "m"(gdtr) : "memory");
 
-    /* Far jump to flush pipeline and switch to 64-bit code segment */
+    /* Set segment registers */
     asm volatile(
-        "cli\n\t"
         "movw $0x08, %%ax\n\t"
         "movw %%ax, %%ds\n\t"
         "movw %%ax, %%es\n\t"
         "movw %%ax, %%ss\n\t"
         "movw %%ax, %%fs\n\t"
         "movw %%ax, %%gs\n\t"
+        :
+        :
+        : "ax", "memory"
+    );
+
+    /* Far jump to flush pipeline and switch to 64-bit code segment */
+    asm volatile(
+        "cli\n\t"
         "pushq $0x08\n\t"
         "lea 1f(%%rip), %%rax\n\t"
         "pushq %%rax\n\t"
@@ -296,7 +303,7 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
         "1:\n\t"
         :
         :
-        : "rax", "ax", "memory"
+        : "rax", "memory"
     );
 
     /* Call long_mode_entry (should be in 64-bit mode now) */
