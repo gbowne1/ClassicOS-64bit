@@ -146,8 +146,8 @@ int get_framebuffer_info(void *mbd, uint64_t *fb_addr, uint32_t *width, uint32_t
 
 void parse_memory_map(void *mbd) {
     uint8_t *tag = (uint8_t *)mbd + 8;
-    volatile char *video_memory = (volatile char *)0xb8000; /* Use text mode video memory for simplicity */
-    size_t offset = 0; /* Track position in video memory for printing */
+    volatile char *video_memory = (volatile char *)0xb8000;
+    size_t offset = 0;
 
     while (((struct multiboot2_tag_end *)tag)->type != 0) {
         if (((struct multiboot2_tag_mmap *)tag)->type == 6) {
@@ -158,11 +158,11 @@ void parse_memory_map(void *mbd) {
                 uint64_t length = *(uint64_t *)(entry + 8);
                 uint32_t type = *(uint32_t *)(entry + 16);
 
-			/* Prevent unused variable warnings */
-			(void)length;
-			(void)type;
+                /* Prevent unused variable warnings */
+                (void)length;
+                (void)type;
 
-                /* Convert and print base_addr (simplified */ 
+                /* Convert and print base_addr (simplified) */
                 char buf[32];
                 size_t buf_idx = 0;
                 uint64_t temp = base_addr;
@@ -182,7 +182,7 @@ void parse_memory_map(void *mbd) {
                 }
                 buf[buf_idx] = '\0';
 
-                /* Print "Base: <base_addr> */
+                /* Print "Base: <base_addr>" */
                 const char *prefix = "Base: ";
                 for (size_t j = 0; prefix[j] != '\0'; j++) {
                     video_memory[offset * 2] = prefix[j];
@@ -199,7 +199,7 @@ void parse_memory_map(void *mbd) {
                 offset++;
 
                 /* Move to next entry */
-                /* entry += mmap->entry_size; */
+                entry += mmap->entry_size;
             }
         }
         tag += ((struct multiboot2_tag *)tag)->size;
@@ -317,6 +317,17 @@ void long_mode_entry(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
     );
 
     volatile char *video_memory = (volatile char *)fb_addr;
+
+    if (fb_type != 1) {
+        video_memory = (volatile char *)0xb8000; /* Fallback to VGA text mode */
+        const char *error = "ERROR: Framebuffer not text mode!";
+        for (size_t i = 0; error[i] != '\0'; i++) {
+            video_memory[i * 2] = error[i];
+            video_memory[i * 2 + 1] = 0x4F;
+        }
+        for (;;)
+            asm volatile("hlt");
+    }
 
     parse_memory_map(mbd);
 
