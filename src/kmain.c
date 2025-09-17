@@ -309,12 +309,12 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
 
 void long_mode_entry(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb_height, uint8_t fb_type) {
     asm volatile(
-        "mov $0x10, %ax\n"
-        "mov %ax, %ds\n"
-        "mov %ax, %es\n"
-        "mov %ax, %fs\n"
-        "mov %ax, %gs\n"
-        "mov %ax, %ss\n"
+        "mov $0x10, %%ax\n"
+        "mov %%ax, %%ds\n"
+        "mov %%ax, %%es\n"
+        "mov %%ax, %%fs\n"
+        "mov %%ax, %%gs\n"
+        "mov %%ax, %%ss\n"
         :
         :
         : "ax"
