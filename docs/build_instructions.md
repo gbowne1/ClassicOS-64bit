@@ -57,6 +57,21 @@ this should compile the current code cleanly.. but produces a kernel.s;
 
 `gcc -ffreestanding -fno-pic -fno-pie -fno-stack-protector -mno-red-zone -nostdlib -m64 -fno-builtin -fno-exceptions -nodefaultlibs -nostartfiles -Wall -Werror -Wextra -Wpedantic -pedantic -pedantic-errors -std=gnu11 -O0 -Iinclude -S -o kernel.s src/kmain.c`
 
+from here we could
+
+`as -o kernel.o kernel.s`
+
+then 
+
+use the included linker script `linker.ld` in /boot/linker.ld
+
+and 
+
+`ld -T linker.ld -o kernel.elf kernel.o` which creates a kernel.elf but we actually might need a .bin or .o
+
+
+
+
 as -std=c11 doesn't work with this code as it's in GNU GAS/AS assembly syntax and we didn't use any specific flags or use `__asm__`
 
 -O0, -01 or -O2 for debugging
