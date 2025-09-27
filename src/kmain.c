@@ -211,11 +211,6 @@ void parse_memory_map(void *mbd) {
 void long_mode_entry(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb_height, uint8_t fb_type) __attribute__((noreturn));
 
 void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb_height, uint8_t fb_type) {
-    (void)mbd;
-    (void)fb_addr;
-    (void)fb_width;
-    (void)fb_height;
-    (void)fb_type;
     /* Page tables (aligned) */
     static uint64_t pml4[512] __attribute__((aligned(4096))) = {0};
     static uint64_t pdpt[512] __attribute__((aligned(4096))) = {0};
@@ -223,7 +218,7 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
 
     /* Map first 16 MB using 2MB pages (8 * 2MB = 16MB) */
     for (int i = 0; i < 8; i++) {
-        pd[i] = (i * 0x200000) | 0x83; /* Present + Writable + Huge Page */
+        pd[i] = (i * 0x200000) | 0x83; /* Present + Writable + Huge Supplemental Page */
     }
     pdpt[0] = (uint64_t)pd | 0x3;      /* Present + Writable */
     pml4[0] = (uint64_t)pdpt | 0x3;    /* Present + Writable */
@@ -233,12 +228,12 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
 
     /* Enable PAE (bit 5 in CR4) */
     asm volatile(
-        "movl %%cr4, %%eax\n\t"
-        "orl $0x20, %%eax\n\t"
-        "movl %%eax, %%cr4\n\t"
+        "movq %%cr4, %%rax\n\t"
+        "orq $0x20, %%rax\n\t"
+        "movq %%rax, %%cr4\n\t"
         :
         :
-        : "eax", "memory"
+        : "rax", "memory"
     );
 
     /* Enable Long Mode in EFER MSR (MSR 0xC0000080, bit 8) */
@@ -255,12 +250,12 @@ void setup_long_mode(void *mbd, uint64_t fb_addr, uint32_t fb_width, uint32_t fb
 
     /* Enable Paging (bit 31 in CR0) */
     asm volatile(
-        "movl %%cr0, %%eax\n\t"
-        "orl $0x80000000, %%eax\n\t"
-        "movl %%eax, %%cr0\n\t"
+        "movq %%cr0, %%rax\n\t"
+        "orq $0x80000000, %%rax\n\t"
+        "movq %%rax, %%cr0\n\t"
         :
         :
-        : "eax", "memory"
+        : "rax", "memory"
     );
 
     /* Setup a minimal GDT (3 entries: null, code, data) */
