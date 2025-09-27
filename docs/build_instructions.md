@@ -49,9 +49,13 @@ To give us error and warning generation, use:
 `-pedantic-errors`
 `-everything`
 
-The correct compile command is 
+The correct compile command is;
 
-` gcc -ffreestanding -fno-pic -fno-pie -fno-stack-protector -mno-red-zone -nostdlib -m64 -fno-builtin -fno-exceptions -nodefaultlibs -nostartfiles -Wall -Werror -Wextra -Wpedantic -pedantic -pedantic-errors -std=gnu11 -O0 -Iinclude -o kernel.o -c src/kmain.c`
+`gcc -ffreestanding -fno-pic -fno-pie -fno-stack-protector -mno-red-zone -nostdlib -m64 -fno-builtin -fno-exceptions -nodefaultlibs -nostartfiles -Wall -Werror -Wextra -Wpedantic -pedantic -pedantic-errors -std=gnu11 -O0 -Iinclude -o kernel.o -c src/kmain.c`
+
+this should compile the current code cleanly.. but produces a kernel.s;
+
+`gcc -ffreestanding -fno-pic -fno-pie -fno-stack-protector -mno-red-zone -nostdlib -m64 -fno-builtin -fno-exceptions -nodefaultlibs -nostartfiles -Wall -Werror -Wextra -Wpedantic -pedantic -pedantic-errors -std=gnu11 -O0 -Iinclude -S -o kernel.s src/kmain.c`
 
 as -std=c11 doesn't work with this code as it's in GNU GAS/AS assembly syntax and we didn't use any specific flags or use `__asm__`
 
