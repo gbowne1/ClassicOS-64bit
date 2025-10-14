@@ -8,7 +8,7 @@ boot.o:
 	nasm -f elf64 boot.s -o boot.o
 
 entry.o:
-	gcc -ffreestanding -fno-stack-protector -mno-red-zone -o entry.o -c entry.c
+	gcc -ffreestanding -fno-stack-protector -mno-red-zone -o kmain.o -c kmain.c
 
 .PHONY: clean
 clean:
