@@ -1,53 +1,53 @@
-/* linker.ld */
-OUTPUT_FORMAT("elf64-x86-64")
 ENTRY(_start)
-
 SECTIONS {
-    /* Load kernel at 1 MiB physical address */
-    . = 0x100000;
+    . = 1M;
+    
+    .mboot ALIGN (4K) : AT(ADDR(.mboot))
 
-    /* Multiboot2 header, 8-byte aligned */
-    .multiboot2 : ALIGN(8) {
-        __multiboot2_start = .;
-        *(.multiboot2)
-        __multiboot2_end = .;
+    {
+        *(.mboot)
     }
+    
+    /* The higher-half kernel virtual address offset */
+    kernOffset = 0xFFFFFFFF80000000;
+	. += kernOffset; /* Add the offset so that all future lables are linked here */
 
-    /* Code section */
-    .text : ALIGN(4K) {
-        __text_start = .;
-        *(.text)
-        __text_end = .;
-    }
+	/* Add a symbol that indicates the start address of the kernel. */
+	_kernel_start = .;
+	_kernel_start_phys = . - kernOffset;
+  	
+	
+	
+	
 
-    /* Read-only data */
-    .rodata : ALIGN(4K) {
-        __rodata_start = .;
-        *(.rodata*)
-        __rodata_end = .;
-    }
+	.text ALIGN (4K) : AT (ADDR (.text) - kernOffset)
+	{
+		*(.text)
+    	code = .; _code = .; __code = .;
+	}
+	
+	.rodata ALIGN (4K) : AT (ADDR (.rodata) - kernOffset)
+	{
+		*(.rodata)
+    	rodata = .; _rodata = .; __rodata = .;
+	}
+	
+	.data ALIGN (4K) : AT (ADDR (.data) - kernOffset)
+	{
+		*(.data)
+    	data = .; _data = .; __data = .;
+	}
 
-    /* Read-write data */
-    .data : ALIGN(4K) {
-        __data_start = .;
-        *(.data)
-        __data_end = .;
-    }
+	.bss  ALIGN (4K): AT (ADDR (.bss) - kernOffset)
+	{
+		*(COMMON)
+		*(.bss)
+    	bss = .; _bss = .; __bss = .;
+	}
 
-    /* BSS (zero-initialized data) */
-    .bss : ALIGN(4K) {
-        __bss_start = .;
-        *(.bss)
-        *(COMMON)
-        __bss_end = .;
-    }
+	/* Add a symbol that indicates the end address of the kernel. */
+	_kernel_end = .; /* The virtual end address of the kernel */
+	_kernel_end_phys = . - kernOffset; /* The Physical end address of the kernel */
+  	end = .; _end = .; __end = .;
 
-    /* Kernel end symbol */
-    __kernel_end = .;
-
-    /* Debugging sections (keep symbols for GDB) */
-    /DISCARD/ : {
-        *(.comment)
-        *(.eh_frame)
-    }
 }
