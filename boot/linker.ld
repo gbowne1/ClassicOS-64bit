@@ -1,53 +1,71 @@
+/* linker.ld — x86-64, GRUB2 Multiboot2, higher-half kernel */
+
 ENTRY(_start)
-SECTIONS {
-    . = 1M;
-    
-    .mboot ALIGN (4K) : AT(ADDR(.mboot))
 
-    {
-        *(.mboot)
-    }
-    
-    /* The higher-half kernel virtual address offset */
-    kernOffset = 0xFFFFFFFF80000000;
-	. += kernOffset; /* Add the offset so that all future lables are linked here */
+/* Higher-half virtual base for the kernel */
+KERN_OFFSET = 0xFFFFFFFF80000000;
 
-	/* Add a symbol that indicates the start address of the kernel. */
-	_kernel_start = .;
-	_kernel_start_phys = . - kernOffset;
-  	
-	
-	
-	
+/* 4 KiB page alignment */
+PAGE = 0x1000;
 
-	.text ALIGN (4K) : AT (ADDR (.text) - kernOffset)
-	{
-		*(.text)
-    	code = .; _code = .; __code = .;
-	}
-	
-	.rodata ALIGN (4K) : AT (ADDR (.rodata) - kernOffset)
-	{
-		*(.rodata)
-    	rodata = .; _rodata = .; __rodata = .;
-	}
-	
-	.data ALIGN (4K) : AT (ADDR (.data) - kernOffset)
-	{
-		*(.data)
-    	data = .; _data = .; __data = .;
-	}
+/* Start all sections at 1 MiB physically, which GRUB commonly uses */
+PHYS_BASE = 0x00100000;
 
-	.bss  ALIGN (4K): AT (ADDR (.bss) - kernOffset)
-	{
-		*(COMMON)
-		*(.bss)
-    	bss = .; _bss = .; __bss = .;
-	}
+SECTIONS
+{
+  /* File starts at physical 1 MiB; VMA begins at PHYS_BASE + KERN_OFFSET */
+  . = PHYS_BASE;
 
-	/* Add a symbol that indicates the end address of the kernel. */
-	_kernel_end = .; /* The virtual end address of the kernel */
-	_kernel_end_phys = . - kernOffset; /* The Physical end address of the kernel */
-  	end = .; _end = .; __end = .;
+  /* Multiboot2 header must be in the first few KiB and kept */
+  .mboot ALIGN(8) : AT(ADDR(.mboot))
+  {
+    KEEP(*(.mboot))
+  }
 
+  /* Switch to higher-half virtual addresses */
+  . = . + KERN_OFFSET;
+
+  /* Mark the virtual and physical kernel range start */
+  _kernel_start_vaddr = .;
+  _kernel_start_paddr = _kernel_start_vaddr - KERN_OFFSET;
+
+  /* Text/code section */
+  .text ALIGN(PAGE) : AT(ADDR(.text) - KERN_OFFSET)
+  {
+    *(.text .text.*)
+    *(.stub)
+  }
+
+  /* Read-only data */
+  .rodata ALIGN(PAGE) : AT(ADDR(.rodata) - KERN_OFFSET)
+  {
+    *(.rodata .rodata.*)
+    *(.gnu.linkonce.r.*)
+    *(.eh_frame*)
+  }
+
+  /* Writable data */
+  .data ALIGN(PAGE) : AT(ADDR(.data) - KERN_OFFSET)
+  {
+    *(.data .data.*)
+    *(.gnu.linkonce.d.*)
+  }
+
+  /* BSS (zero-initialized) */
+  .bss ALIGN(PAGE) : AT(ADDR(.bss) - KERN_OFFSET)
+  {
+    *(COMMON)
+    *(.bss .bss.*)
+    *(.gnu.linkonce.b.*)
+  }
+
+  /* End markers */
+  _kernel_end_vaddr = .;
+  _kernel_end_paddr = _kernel_end_vaddr - KERN_OFFSET;
 }
+
+/* Provide aliases some toolchains expect */
+PROVIDE(__kernel_start = _kernel_start_vaddr);
+PROVIDE(__kernel_end   = _kernel_end_vaddr);
+PROVIDE(__kernel_phys_start = _kernel_start_paddr);
+PROVIDE(__kernel_phys_end   = _kernel_end_paddr);
